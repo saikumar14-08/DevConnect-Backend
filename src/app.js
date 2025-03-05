@@ -3,20 +3,18 @@ const express = require("express");
 
 const app = express();
 
-app.listen(3000, () =>
-  console.log("Server successfully listening to port 3000")
-);
-
-app.get('/',(req,res)=> {
-  res.send("THis is Home page");
-})
-
 app.get('/test',(req,res) => {
   res.send("This is test page");
 })
 
-app.get("/hello",(req,res) => {
-  res.send("This is Hello page")
-})
+app.post('/test',(req,res)=> res.send("Data posted successfully"));
+
+app.patch('/test',(req,res)  => res.send("Data Patched successfully"));
+
+app.delete('/test',(req,res)=> res.send("Data deleted successfully"))
 
 console.log("This is app.js");
+
+app.listen(3000, () =>
+  console.log("Server successfully listening to port 3000")
+);
