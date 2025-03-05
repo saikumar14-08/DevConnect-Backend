@@ -1,0 +1,23 @@
+{
+  "name": "dev_tinder",
+  "version": "1.0.0",
+  "description": "Tinder for developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saikumar14-08/Node_Project.git"
+  },
+  "author": "Sai Kumar Reddy Boreddy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saikumar14-08/Node_Project/issues"
+  },
+  "homepage": "https://github.com/saikumar14-08/Node_Project#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
