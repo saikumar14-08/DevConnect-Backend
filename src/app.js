@@ -1,37 +1,25 @@
-const adminCheck = require('./Middlewares/admin')
-
 const express = require("express");
-
+const user = require("./models/user");
+const connectDB = require("./config/database");
 const app = express();
 
-app.use('/admin',adminCheck)
+const PORT = 3002;
 
-app.get('/admin/addUser', (req,res) => {
-  // let token = 'admin';
-  console.log("This is admin/addUser");
-  // if(token === 'admin') {
-    res.send("Added user")
-  // }
-})
-app.get('/admin/deleteUser', (req,res) => {
-  // let token = 'admin';
-  console.log("This is admin/deleteUser");
-  // if(token === 'admin') {
-    res.send("Deleted user")
-  // }
-})
+app.post("/signup", (req, res) => {
+  const data = new user({
+    firstName: "pooja",
+    lastName: "Boreddy",
+    age: 26,
+  });
+  data.save();
+  res.send("User added successfully");
+});
 
-app.get('/user', (req,res) => {
-  console.log("This is User");
-  res.send("This is User")  
-})
-app.post('/test',(req,res)=> res.send("Data posted successfully"));
-
-app.patch('/test',(req,res)  => res.send("Data Patched successfully"));
-
-app.delete('/test',(req,res)=> res.send("Data deleted successfully"))
-
-// console.log("This is app.js");
-app.listen(3000, () =>
-  console.log("Server successfully listening to port 3000")
-);
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully");
+    app.listen(PORT, () =>
+      console.log(`Server successfully listening to port ${PORT}`)
+    );
+  })
+  .catch((e) => console.log("Something went wrong"));
