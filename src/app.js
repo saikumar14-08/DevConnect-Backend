@@ -4,8 +4,6 @@ const connectDB = require("./config/database");
 const { default: mongoose } = require("mongoose");
 const app = express();
 
-const PORT = 3001;
-
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
@@ -31,7 +29,6 @@ app.get("/user", async (req, res) => {
 });
 
 app.get("/feed", async (req, res) => {
-  // const userFeed = req.body;
   const allUsers = await user.find({});
   try {
     !allUsers ? res.status(500).send("No Data in DB") : res.send(allUsers);
@@ -40,6 +37,28 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+app.delete("/user", async (req, res) => {
+  try {
+    const delId = await req.body._id;
+    const deletedUser = await user.findByIdAndDelete({ _id: delId });
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(500).send("Deleting unsuccessful");
+  }
+});
+
+app.patch("/user", async (req, res) => {
+  try {
+    const patchId = await req.body._id;
+    const data = await req.body;
+    const patchQuery = await user.findByIdAndUpdate({ _id: patchId }, data);
+    res.send("User Patched successfully");
+  } catch (err) {
+    res.status(500).send("User patch not working");
+  }
+});
+
+const PORT = 3002;
 connectDB()
   .then(() => {
     console.log("Database connected successfully");

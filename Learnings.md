@@ -38,3 +38,8 @@ app.all() Matches all HTTP methods but only for an exact path.
 
 -> Why \_id and \_\_v fields in our database important? What is the use of it.
 -> Always use try catch when sending the error
+
+-> JSON vs JS vs JS object
+-> /user : Get user by email.
+-> /feed : get All users from database. - use mongoose.find
+35:13
