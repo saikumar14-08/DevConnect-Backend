@@ -1,12 +1,24 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 const { Schema } = mongoose;
 
 const userSchema = new Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String },
-    age: { type: Number, required: true },
-    emailId: { type: String, required: true, unique: true },
+    firstName: { type: String, required: true, minLength: 1, maxLength: 50 },
+    lastName: { type: String, minLength: 1, maxLength: 50 },
+    age: {
+      type: Number,
+      required: true,
+      validate: (val) => val > 18 && val < 100,
+    },
+    emailId: {
+      type: String,
+      required: true,
+      validate(val) {
+        return validator.isEmail(val);
+      },
+      unique: true,
+    },
     password: { type: String, required: true, minLength: 8 },
     gender: {
       type: String,
@@ -19,9 +31,16 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://www.pngall.com/wp-content/uploads/5/Profile-Male-Transparent.png",
+      validate(val) {
+        return validator.isURL(val);
+      },
     },
-    about: { type: String, default: "This is default about section" },
-    skills: [{ type: String }],
+    about: {
+      type: String,
+      default: "This is default about section",
+      maxLength: 500,
+    },
+    skills: { type: [String], validate: (val) => val.length < 50 },
   },
   { timestamps: true }
 );

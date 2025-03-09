@@ -42,4 +42,7 @@ app.all() Matches all HTTP methods but only for an exact path.
 -> JSON vs JS vs JS object
 -> /user : Get user by email.
 -> /feed : get All users from database. - use mongoose.find
-35:13
+
+-> Server validations
+-> API level validations.
+-> Using validation library for easy checking

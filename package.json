@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
-     "dev": "npx kill-port 3009 && nodemon src/app.js"
+    "dev": "npx kill-port 3000 && nodemon src/app.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   "homepage": "https://github.com/saikumar14-08/Node_Project#readme",
   "dependencies": {
     "express": "^4.21.2",
-    "mongoose": "^8.12.1"
+    "mongoose": "^8.12.1",
+    "validator": "^13.12.0"
   }
 }

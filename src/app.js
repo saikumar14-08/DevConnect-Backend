@@ -14,7 +14,7 @@ app.post("/signup", async (req, res) => {
     await reqBody.save();
     res.send("User added successfully");
   } catch (e) {
-    res.status(500).send("User cannot be Added");
+    res.status(500).send("User cannot be Added: " + e);
   }
 });
 
@@ -47,12 +47,22 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:patchId", async (req, res) => {
+  const patchId = await req.params?.patchId;
+  const data = await req.body;
+
   try {
-    const patchId = await req.body._id;
-    const data = await req.body;
-    const patchQuery = await user.findByIdAndUpdate({ _id: patchId }, data);
-    res.send("User Patched successfully");
+    const EDITABLE_FIELDS = ["lastName", "photoUrl", "about", "age", "skills"];
+    const isUpdateAllowd = Object.keys(data).every((k) =>
+      EDITABLE_FIELDS.includes(k)
+    );
+    if (!isUpdateAllowd) throw new Error("Update not allowed");
+    else {
+      const patchQuery = await user.findByIdAndUpdate(patchId, data, {
+        runValidators: true,
+      });
+      res.send("User Patched successfully");
+    }
   } catch (err) {
     res.status(500).send("User patch not working");
   }
