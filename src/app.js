@@ -8,13 +8,13 @@ app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   const reqBody = new user(req.body);
-  console.log(reqBody);
 
   try {
+    await reqBody.validate();
     await reqBody.save();
     res.send("User added successfully");
   } catch (e) {
-    console.error("User cannot be added");
+    res.status(500).send("User cannot be Added");
   }
 });
 
@@ -24,7 +24,7 @@ app.get("/user", async (req, res) => {
   try {
     resUser ? res.send(resUser) : res.send("No user matched");
   } catch (e) {
-    console.log("/user error");
+    res.status(500).send("/user error");
   }
 });
 
@@ -58,7 +58,17 @@ app.patch("/user", async (req, res) => {
   }
 });
 
-const PORT = 3002;
+// app.patch("/user", async (req, res) => {
+//   const emailId = await req.body.emailId;
+//   const data = await req.body;
+//   try {
+//     const updatedData = await user.findOneAndUpdate({ emailId }, data);
+//     res.send("Updated using email ID ");
+//   } catch (e) {
+//     res.status(500).send("Update using email unsuccessful");
+//   }
+// });
+const PORT = 3000;
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
