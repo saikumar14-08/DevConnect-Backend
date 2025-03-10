@@ -14,12 +14,9 @@ const userSchema = new Schema(
     emailId: {
       type: String,
       required: true,
-      validate(val) {
-        return validator.isEmail(val);
-      },
       unique: true,
     },
-    password: { type: String, required: true, minLength: 8 },
+    password: { type: String, required: true },
     gender: {
       type: String,
       validate: (val) => {
@@ -31,9 +28,6 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://www.pngall.com/wp-content/uploads/5/Profile-Male-Transparent.png",
-      validate(val) {
-        return validator.isURL(val);
-      },
     },
     about: {
       type: String,

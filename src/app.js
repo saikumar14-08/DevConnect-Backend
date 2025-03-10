@@ -2,19 +2,63 @@ const express = require("express");
 const user = require("./models/user");
 const connectDB = require("./config/database");
 const { default: mongoose } = require("mongoose");
+const SignUpAPI = require("./utils/userValidation");
+const bcrypt = require("bcrypt");
+const { trim } = require("validator");
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const reqBody = new user(req.body);
-
   try {
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+      photoUrl,
+      about,
+      skills,
+    } = req.body;
+
+    const hashedPwd = await bcrypt.hash(password, 10);
+    console.log(password, hashedPwd);
+
+    SignUpAPI(req.body);
+    const reqBody = new user({
+      firstName,
+      lastName,
+      emailId: trim(emailId),
+      age,
+      password: hashedPwd,
+      photoUrl,
+      about,
+      skills,
+    });
+
+    console.log(reqBody);
+
     await reqBody.validate();
     await reqBody.save();
     res.send("User added successfully");
   } catch (e) {
     res.status(500).send("User cannot be Added: " + e);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const emailCheck = await user.findOne({ emailId: emailId });
+    if (!emailCheck) throw new Error("Invalid email ID.");
+
+    const pwdCheck = await bcrypt.compare(password, emailCheck.password);
+    if (pwdCheck) res.send("User logged In");
+    else throw new Error("Invalid Password");
+  } catch (e) {
+    res.status(500).send(e.message);
   }
 });
 
