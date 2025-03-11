@@ -7,7 +7,8 @@ const bcrypt = require("bcrypt");
 const { trim } = require("validator");
 const cookieParser = require("cookie-parser");
 const app = express();
-const jwt = require("jsonwebtoken");
+const userAuth = require("./middleware/userAuth");
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,7 +27,6 @@ app.post("/signup", async (req, res) => {
     } = req.body;
 
     const hashedPwd = await bcrypt.hash(password, 10);
-    console.log(password, hashedPwd);
 
     SignUpAPI(req.body);
     const reqBody = new user({
@@ -39,8 +39,6 @@ app.post("/signup", async (req, res) => {
       about,
       skills,
     });
-
-    console.log(reqBody);
 
     await reqBody.validate();
     await reqBody.save();
@@ -56,9 +54,11 @@ app.post("/login", async (req, res) => {
     const emailCheck = await user.findOne({ emailId: emailId });
     if (!emailCheck) throw new Error("Invalid email ID.");
 
-    const pwdCheck = await bcrypt.compare(password, emailCheck.password);
+    const pwdCheck = await emailCheck.decryptPwd(password);
+    console.log(pwdCheck);
+
     if (pwdCheck) {
-      var token = jwt.sign({ _id: emailCheck._id }, "Sai@1999");
+      const token = await emailCheck.getJWT();
       res.cookie("usercookie", token);
       if (token) res.send("Logged In successfully");
     } else throw new Error("Invalid Password");
@@ -67,25 +67,21 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookie = req.cookies.usercookie;
-    const decoded = jwt.verify(cookie, "Sai@1999");
-    let { _id } = decoded;
-    const userProfile = await user.findById({ _id });
-    res.send(userProfile);
+    res.send(req.user);
   } catch (e) {
-    res.status(500).send(e.message);
+    res.status(500).send(e);
   }
 });
 
-app.get("/user", async (req, res) => {
-  const lastName = await req.body.lastName;
-  const resUser = await user.find({ lastName: lastName });
+app.post("/connectionRequest", userAuth, async (req, res) => {
   try {
-    resUser ? res.send(resUser) : res.send("No user matched");
+    const userFirstName = req.user.firstName;
+    if (!req.user) res.status(401).send("Token expored");
+    res.send(`${userFirstName} sent connection request`);
   } catch (e) {
-    res.status(500).send("/user error");
+    res.status(500).send("Error sending connection request");
   }
 });
 
