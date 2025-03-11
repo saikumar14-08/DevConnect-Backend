@@ -46,3 +46,5 @@ app.all() Matches all HTTP methods but only for an exact path.
 -> Server validations
 -> API level validations.
 -> Using validation library for easy checking
+
+-> After clearing cookie value and again trying to login getting 404 error in postman. Then again without any changes saved the file again and the error in console is going away then if i try to login everything is working as expected.
