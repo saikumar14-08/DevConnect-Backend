@@ -5,9 +5,11 @@ const { default: mongoose } = require("mongoose");
 const SignUpAPI = require("./utils/userValidation");
 const bcrypt = require("bcrypt");
 const { trim } = require("validator");
+const cookieParser = require("cookie-parser");
 const app = express();
-
+const jwt = require("jsonwebtoken");
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -55,8 +57,23 @@ app.post("/login", async (req, res) => {
     if (!emailCheck) throw new Error("Invalid email ID.");
 
     const pwdCheck = await bcrypt.compare(password, emailCheck.password);
-    if (pwdCheck) res.send("User logged In");
-    else throw new Error("Invalid Password");
+    if (pwdCheck) {
+      var token = jwt.sign({ _id: emailCheck._id }, "Sai@1999");
+      res.cookie("usercookie", token);
+      if (token) res.send("Logged In successfully");
+    } else throw new Error("Invalid Password");
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookie = req.cookies.usercookie;
+    const decoded = jwt.verify(cookie, "Sai@1999");
+    let { _id } = decoded;
+    const userProfile = await user.findById({ _id });
+    res.send(userProfile);
   } catch (e) {
     res.status(500).send(e.message);
   }
