@@ -21,7 +21,8 @@ authRouter.post("/signup", async (req, res) => {
 
     const hashedPwd = await bcrypt.hash(password, 10);
 
-    SignUpAPI(req.body);
+    await SignUpAPI(req.body);
+
     const reqBody = new user({
       firstName,
       lastName,
@@ -46,10 +47,7 @@ authRouter.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
     const emailCheck = await user.findOne({ emailId: emailId });
     if (!emailCheck) throw new Error("Invalid email ID.");
-
     const pwdCheck = await emailCheck.decryptPwd(password);
-    console.log(pwdCheck);
-
     if (pwdCheck) {
       const token = await emailCheck.getJWT();
       res.cookie("usercookie", token);
@@ -60,4 +58,8 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("usercookie", null, { expires: new Date(Date.now()) });
+  res.send("Logged out successfully");
+});
 module.exports = authRouter;

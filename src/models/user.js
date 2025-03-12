@@ -11,7 +11,6 @@ const userSchema = new Schema(
     age: {
       type: Number,
       required: true,
-      validate: (val) => val > 18 && val < 100,
     },
     emailId: {
       type: String,

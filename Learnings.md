@@ -47,4 +47,14 @@ app.all() Matches all HTTP methods but only for an exact path.
 -> API level validations.
 -> Using validation library for easy checking
 
--> After clearing cookie value and again trying to login getting 404 error in postman. Then again without any changes saved the file again and the error in console is going away then if i try to login everything is working as expected.
+-> After clearing cookie value and again trying to login getting 404 error in postman. Then again without any changes saved the file again and the error in console is going away then if i try to login everything is working as expected. Getting: node:\_http_outgoing:699
+throw new ERR_HTTP_HEADERS_SENT('set');
+^
+
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+
+-> For forgot password API:
+
+-if(UserLoggedIn === true) Directly fetch the pwd and change it(You can send the new Password in req.body).
+
+- if(UserLoggedIn === flase) Send emailId and new Pwd in body and check authenticity of our emailId and if it is valid change the password. else throw error saying emailId isn't registered.
