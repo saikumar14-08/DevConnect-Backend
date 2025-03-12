@@ -42,7 +42,7 @@ const userSchema = new Schema(
 
 userSchema.methods.getJWT = async function () {
   /**As we are using this in the schema methods make sure you use anonymous functions/function expressions
-   * but do not use arrow functions.
+   * but do not use arrow functions because of scoping issues.
    */
   const user = this;
   const token = jwt.sign({ _id: user._id }, "Sai@1999", { expiresIn: "1h" });
@@ -54,5 +54,7 @@ userSchema.methods.decryptPwd = async function (password) {
   const decryptPwd = await bcrypt.compare(password, user.password);
   return decryptPwd;
 };
+
+userSchema.index({ firstName: 1, lastName: 1 });
 const User = mongoose.model("User", userSchema);
 module.exports = User;

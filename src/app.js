@@ -7,6 +7,7 @@ const userAuth = require("./middleware/userAuth");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const User = require("./models/user");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -16,6 +17,16 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 
 const PORT = 3000;
+
+// Feed API is just to check all the db in postman
+app.get("/feed", async (req, res) => {
+  try {
+    const allUsers = await User.find({});
+    res.send(allUsers);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 connectDB()
   .then(() => {
     console.log("Database connected successfully");

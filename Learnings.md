@@ -58,3 +58,6 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 -if(UserLoggedIn === true) Directly fetch the pwd and change it(You can send the new Password in req.body).
 
 - if(UserLoggedIn === flase) Send emailId and new Pwd in body and check authenticity of our emailId and if it is valid change the password. else throw error saying emailId isn't registered.
+
+- Pros and cons of indexing and why do we need it in first place.
+- How to write queries in find() like $or, $not etc.,
