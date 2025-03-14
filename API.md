@@ -15,14 +15,16 @@ profileRouter:
 connectionRequestRouter:
 
 - post /request/send/:status/:userId
+
   - status can be ignored or interested
-- post /request/review/accepted/:requestId
-- post /request/review/rejected/:requestId
+
+- post /request/review/:status/:requestId
+  - status can be requested or rejected
 
 userRouter:
 
 - get /user/connections
+- get /user/requests/received
 - get /user/feed (gives you profile of users)
-- get /user/requests/recevied
 
   Status: pass, like

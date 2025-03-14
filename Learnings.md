@@ -61,3 +61,5 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 
 - Pros and cons of indexing and why do we need it in first place.
 - How to write queries in find() like $or, $not etc.,
+
+- What is the use of creating references in mongoose schema. ref: "Table_name"

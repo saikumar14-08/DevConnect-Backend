@@ -1,6 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const SignUpAPI = require("../utils/userValidation");
+const { SignUpAPI } = require("../utils/userValidation");
 const authRouter = express.Router();
 const user = require("../models/user");
 const { trim } = require("validator");
@@ -19,9 +19,8 @@ authRouter.post("/signup", async (req, res) => {
       skills,
     } = req.body;
 
+    SignUpAPI(req.body);
     const hashedPwd = await bcrypt.hash(password, 10);
-
-    await SignUpAPI(req.body);
 
     const reqBody = new user({
       firstName,
