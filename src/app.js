@@ -7,8 +7,6 @@ const userAuth = require("./middleware/userAuth");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
-const User = require("./models/user");
-const ConnectionRequest = require("./models/connectionrequest");
 const UserRouter = require("./routes/userroute");
 const cors = require("cors");
 

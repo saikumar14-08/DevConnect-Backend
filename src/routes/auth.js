@@ -50,7 +50,7 @@ authRouter.post("/login", async (req, res) => {
     if (pwdCheck) {
       const token = await emailCheck.getJWT();
       res.cookie("usercookie", token);
-      if (token) res.send("Logged In successfully");
+      if (token) res.send(emailCheck);
     } else throw new Error("Invalid Password");
   } catch (e) {
     res.status(500).send(e.message);
