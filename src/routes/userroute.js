@@ -16,16 +16,20 @@ UserRouter.get("/user/connections", userAuth, async (req, res) => {
     })
       .populate("fromUserId", USER_SAFE_DATA)
       .populate("toUserId", USER_SAFE_DATA);
+
+    if (!fromUsers.length)
+      return res.json({
+        message: `Hey ${firstName}, no connection requests yet!`,
+      });
     const data = fromUsers.map((field) => {
       if (field.fromUserId._id.equals(_id)) {
         return field.toUserId;
       } else return field.fromUserId;
     });
-    if (!fromUsers.length)
-      res.send("Sorry " + firstName + " you got no connections.");
+    // res.send(data);
     res.json({
       message: "Hi " + firstName + "!! here are your connections.",
-      data: { data },
+      data,
     });
   } catch (e) {
     res.status(500).send(e + " NO Users");
@@ -40,13 +44,8 @@ UserRouter.get("/user/requests/received", userAuth, async (req, res) => {
       status: "interested",
     }).populate("fromUserId", USER_SAFE_DATA);
     if (!fromUsers.length)
-      res.send(
-        "Sorry " + firstName + " you got no requests. Please check later"
-      );
-    res.json({
-      message: "Hi " + firstName + "!! here are your requests.",
-      data: { fromUsers },
-    });
+      return res.send(`Hey ${firstName}, no connection requests yet!`);
+    res.send(fromUsers);
   } catch (e) {
     res.status(500).send(e + " NO Users");
   }
