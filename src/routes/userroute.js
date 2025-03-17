@@ -18,19 +18,14 @@ UserRouter.get("/user/connections", userAuth, async (req, res) => {
       .populate("toUserId", USER_SAFE_DATA);
 
     if (!fromUsers.length)
-      return res.json({
-        message: `Hey ${firstName}, no connection requests yet!`,
-      });
+      return res.send(`Hey ${firstName}, no connections yet!`);
     const data = fromUsers.map((field) => {
       if (field.fromUserId._id.equals(_id)) {
         return field.toUserId;
       } else return field.fromUserId;
     });
     // res.send(data);
-    res.json({
-      message: "Hi " + firstName + "!! here are your connections.",
-      data,
-    });
+    res.send(data);
   } catch (e) {
     res.status(500).send(e + " NO Users");
   }
