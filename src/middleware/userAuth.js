@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
-  var { usercookie } = req.cookies;
+  var { usercookie } = req?.cookies;
   if (!usercookie)
     res.status(401).send("There is no token!!. Please login again");
   else {
