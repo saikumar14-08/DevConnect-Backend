@@ -35,12 +35,13 @@ authRouter.post("/signup", async (req, res) => {
 
     await reqBody.validate();
     await reqBody.save();
+    const token = await reqBody.getJWT();
+    res.cookie("usercookie", token);
     res.json(reqBody);
   } catch (e) {
     res.status(500).send("User cannot be Added: " + e);
   }
 });
-
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
