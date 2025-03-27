@@ -3,6 +3,7 @@ const validator = require("validator");
 const { Schema } = mongoose;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 
 const userSchema = new Schema(
   {
@@ -45,7 +46,9 @@ userSchema.methods.getJWT = async function () {
    * but do not use arrow functions because of scoping issues.
    */
   const user = this;
-  const token = jwt.sign({ _id: user._id }, "Sai@1999", { expiresIn: "1h" });
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_HASH_SECRET, {
+    expiresIn: "1h",
+  });
   return token;
 };
 

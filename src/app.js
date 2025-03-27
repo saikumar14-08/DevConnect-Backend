@@ -9,6 +9,7 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const UserRouter = require("./routes/userroute");
 const cors = require("cors");
+require("dotenv").config();
 
 app.use(
   cors({
@@ -24,13 +25,11 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", UserRouter);
 
-const PORT = 3000;
-
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    app.listen(PORT, () =>
-      console.log(`Server successfully listening to port ${PORT}`)
+    app.listen(process.env.PORT, () =>
+      console.log(`Server successfully listening to port ${process.env.PORT}`)
     );
   })
   .catch((e) => console.log("Something went wrong"));
