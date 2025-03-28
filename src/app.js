@@ -9,7 +9,7 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const UserRouter = require("./routes/userroute");
 const cors = require("cors");
-const cron = require("./utils/cronJob");
+require("./utils/cronJob");
 require("dotenv").config();
 
 app.use(
@@ -34,5 +34,3 @@ connectDB()
     );
   })
   .catch((e) => console.log("Something went wrong"));
-
-cron;
