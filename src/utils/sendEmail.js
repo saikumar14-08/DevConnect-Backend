@@ -4,18 +4,11 @@ const { sesClient } = require("./sesClient");
 const createSendEmailCommand = (toAddress, fromAddress, body) => {
   return new SendEmailCommand({
     Destination: {
-      CcAddresses: [
-        /* more items */
-      ],
-      ToAddresses: [
-        toAddress,
-        /* more To-email addresses */
-      ],
+      CcAddresses: [],
+      ToAddresses: [toAddress],
     },
     Message: {
-      /* required */
       Body: {
-        /* required */
         Html: {
           Charset: "UTF-8",
           Data: `<h1>${body}</h1>`,
@@ -31,13 +24,11 @@ const createSendEmailCommand = (toAddress, fromAddress, body) => {
       },
     },
     Source: fromAddress,
-    ReplyToAddresses: [
-      /* more items */
-    ],
+    ReplyToAddresses: [],
   });
 };
 
-const run = async (body) => {
+const run = async (toAddress, body) => {
   const sendEmailCommand = createSendEmailCommand(
     "sboreddy1s@semo.edu",
     "support@devconnekt.com",

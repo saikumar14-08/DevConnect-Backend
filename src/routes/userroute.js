@@ -24,7 +24,6 @@ UserRouter.get("/user/connections", userAuth, async (req, res) => {
         return field.toUserId;
       } else return field.fromUserId;
     });
-    // res.send(data);
     res.send(data);
   } catch (e) {
     res.status(500).send(e + " NO Users");
