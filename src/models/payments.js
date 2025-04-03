@@ -16,6 +16,10 @@ const paymentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: true,
+  },
   receipt: {
     type: String,
     required: true,

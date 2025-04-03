@@ -30,6 +30,7 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
       amount: order?.amount,
       currency: order.currency,
       receipt: order.receipt,
+      status: order.status,
       notes: {
         firstName,
         lastName,
@@ -47,7 +48,7 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
 });
 
 paymentrouter.post("/payment/webhook", async (req, res) => {
-  const signature = req.headers["x-razorpay-signature"];
+  const signature = req.headers("x-razorpay-signature");
   try {
     const isValid = await validateWebhookSignature(
       JSON.stringify(req.body),
@@ -67,9 +68,12 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     await payment.save();
     // Update premium flag in DB.
     const user = await User.findById({ _id: payment.userId });
+    console.log(user);
     const membership = await User.findOne({
       memberShipType: payment.notes.memberShipType,
     });
+    console.log(membership);
+
     await User.save();
   } catch (e) {
     res.status(400).send(e.message);
