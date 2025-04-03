@@ -39,8 +39,6 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
     });
     const key_id = process.env.RAZORPAY_KEY_ID;
     await paymentInfo.save();
-    // console.log({ ...paymentInfo.toObject(), key_id, emailId });
-
     res.status(201).json({ ...paymentInfo.toObject(), key_id, emailId });
   } catch (e) {
     res.send(e.message);

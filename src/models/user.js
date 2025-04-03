@@ -27,7 +27,8 @@ const userSchema = new Schema(
       },
     },
     isPremium: {
-      type: String,
+      type: Boolean,
+      default: false,
     },
     memberShipType: {
       type: String,
