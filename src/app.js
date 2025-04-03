@@ -9,6 +9,7 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const UserRouter = require("./routes/userroute");
 const cors = require("cors");
+const paymentrouter = require("./routes/payment");
 require("./utils/cronJob");
 require("dotenv").config();
 
@@ -25,6 +26,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", UserRouter);
+app.use("/", paymentrouter);
 
 connectDB()
   .then(() => {

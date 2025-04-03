@@ -26,6 +26,12 @@ const userSchema = new Schema(
           throw new Error("Select the God given gender");
       },
     },
+    isPremium: {
+      type: String,
+    },
+    memberShipType: {
+      type: String,
+    },
     photoUrl: {
       type: String,
       default:
