@@ -50,16 +50,8 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
 });
 paymentrouter.post("/payment/webhook", async (req, res) => {
   const webhookSignature = req.get("X-Razorpay-Signature");
-  const timestamp = new Date().toISOString(); // Get the current timestamp in ISO format
-
   try {
-    console.log(`[${timestamp}] 🔔 Webhook received`);
-
-    // Log the user ID for tracking
-    const userId = req.body?.payload?.payment?.entity?.user_id; // Assuming user_id exists in the webhook payload
-
-    console.log(`[${timestamp}] UserID: ${userId}`);
-
+    console.log(`🔔 Webhook received`);
     const isValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
@@ -67,26 +59,26 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     );
 
     if (!isValid) {
-      console.log(`[${timestamp}] ❌ Invalid webhook signature`);
+      console.log(`❌ Invalid webhook signature`);
       return res.status(401).send("Invalid webhook signature");
     }
 
     const paymentDetails = req.body.payload.payment.entity;
 
-    console.log(`[${timestamp}] ✅ Payment Details:`, paymentDetails);
+    console.log(`✅ Payment Details:== `, paymentDetails);
 
     const payment = await PaymentInformation.findOne({
       orderId: paymentDetails.order_id,
     });
 
-    if (!payment) {
-      console.log(`[${timestamp}] ⚠️ No matching payment found`);
-      return res.status(404).send("Payment not found");
-    }
+    // if (!payment) {
+    //   console.log(`[${timestamp}] ⚠️ No matching payment found`);
+    //   return res.status(404).send("Payment not found");
+    // }
 
     payment.status = paymentDetails.status;
     await payment.save();
-    console.log(`[${timestamp}] ✅ Payment status updated`);
+    console.log(`✅ Payment status updated`);
 
     if (["captured", "authorized"].includes(payment.status)) {
       const user = await User.findById(payment.userId);
