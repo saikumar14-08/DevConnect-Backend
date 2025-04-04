@@ -11,14 +11,13 @@ const User = require("../models/user");
 require("dotenv").config();
 
 paymentrouter.post("/payment", userAuth, async (req, res) => {
-  const { firstName, lastName, _id, emailId } = req.user;
+  const { firstName, lastName, emailId } = req.user;
   const { choice } = req.body;
   try {
     const order = await instance.orders.create({
       amount: memberShipTypes[choice] * 100,
       currency: "INR",
       receipt: "receipt#2",
-      payment_capture: 1,
       notes: {
         firstName,
         lastName,
@@ -28,7 +27,7 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
     console.log("Order: ", order);
 
     const paymentInfo = new PaymentInformation({
-      userId: _id,
+      userId: req.user._id,
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
@@ -51,10 +50,11 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
     return res.status(500).send(e.message);
   }
 });
+
 paymentrouter.post("/payment/webhook", async (req, res) => {
-  const webhookSignature = req.get("X-Razorpay-Signature");
   try {
     console.log(`🔔 Webhook received`);
+    const webhookSignature = req.get("X-Razorpay-Signature");
     const isValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
@@ -73,27 +73,38 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     const payment = await PaymentInformation.findOne({
       orderId: paymentDetails.order_id,
     });
+    console.log("Payment:--- ", payment);
+    payment.status = paymentDetails.status;
+    await payment.save();
+    console.log("Payment saved");
+
+    const user = await User.findOne({ _id: payment.userId });
+    user.isPremium = true;
+    user.memberShipType = payment.notes.memberShip;
+    console.log("User saved: ", user);
+
+    await user.save();
 
     // if (!payment) {
-    //   console.log(`[${timestamp}] ⚠️ No matching payment found`);
+    //   console.log(`⚠️ No matching payment found`);
     //   return res.status(404).send("Payment not found");
     // }
 
-    payment.status = paymentDetails.status;
-    await payment.save();
-    console.log(`✅ Payment status updated`);
+    // payment.status = paymentDetails.status;
+    // await payment.save();
+    // console.log(`✅ Payment status updated`);
 
-    if (["captured", "authorized"].includes(payment.status)) {
-      const user = await User.findById(payment.userId);
-      if (user) {
-        user.isPremium = true;
-        user.memberShipType = payment.notes.memberShip;
-        await user.save();
-        console.log(`🎉 User upgraded to premium`);
-      }
-    }
+    // if (["captured", "authorized"].includes(payment.status)) {
+    //   const user = await User.findById(payment.userId);
+    //   if (user) {
+    //     user.isPremium = true;
+    //     user.memberShipType = payment.notes.memberShip;
+    //     await user.save();
+    //     console.log(`🎉 User upgraded to premium`);
+    //   }
+    // }
 
-    return res.status(200).send("Webhook processed");
+    return res.status(200).send("Webhook processed Successfully");
   } catch (e) {
     console.error(`🔴 Webhook error:`, e.message);
     return res.status(400).send(e.message);

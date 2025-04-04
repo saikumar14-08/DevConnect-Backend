@@ -7,9 +7,13 @@ const paymentSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
+    required: true,
+  },
+  paymentId: {
+    type: String,
   },
   amount: {
-    type: String,
+    type: Number,
     required: true,
   },
   currency: {
@@ -40,9 +44,6 @@ const paymentSchema = new mongoose.Schema({
   },
 });
 
-const PaymentInformation = new mongoose.model(
-  "PaymentInformation",
-  paymentSchema
-);
+const PaymentInformation = mongoose.model("PaymentInformation", paymentSchema);
 
 module.exports = PaymentInformation;
