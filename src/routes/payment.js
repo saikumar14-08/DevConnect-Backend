@@ -38,11 +38,14 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
         memberShip: order.notes.memberShip,
       },
     });
-    const key_id = process.env.RAZORPAY_KEY_ID;
-    await paymentInfo.save();
-    res.status(201).json({ ...paymentInfo.toObject(), key_id, emailId });
+    const savedPayment = await paymentInfo.save();
+    res.status(201).json({
+      ...savedPayment.toObject(),
+      key_id: process.env.RAZORPAY_KEY_ID,
+      emailId,
+    });
   } catch (e) {
-    res.send(e.message);
+    return res.status(500).send(e.message);
   }
 });
 
@@ -50,25 +53,27 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
   const signature = req.headers["x-razorpay-signature"];
   try {
     console.log("Web hook called");
-    const isValid = await validateWebhookSignature(
+    const isValid = validateWebhookSignature(
       JSON.stringify(req.body),
       signature,
       process.env.RAZORPAY_WEBHOOK_SECRET
     );
     if (!isValid) {
+      console.log("Invalid webhook signature");
       res.status(401).send("Webhook is not valid");
     }
+    console.log("Valid Web hook");
     // Update payment status in DB.
     const paymentDetails = await req.body.payload.payment.entity;
-    console.log("Payment Details: ", paymentDetails);
+    console.log("Payment Details: ===== ", paymentDetails);
+
     const payment = await PaymentInformation.findOne({
-      orderId: paymentDetails.orderId,
+      orderId: paymentDetails.order_id,
     });
     payment.status = paymentDetails.status;
-    console.log("Payment details=========="+paymentDetails);
 
     await payment.save();
-console.log("Payment Saved");
+    console.log("Payment Saved");
     // Update premium flag in DB.
 
     if (payment.status === "captured" || payment.status === "authorized") {
