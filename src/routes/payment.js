@@ -25,18 +25,21 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
         memberShip: choice,
       },
     });
+    console.log("Order: ", order);
+
     const paymentInfo = new PaymentInformation({
       userId: _id,
       orderId: order.id,
-      amount: order?.amount,
+      amount: order.amount,
       currency: order.currency,
       receipt: order.receipt,
       status: order.status,
-      notes: {
-        firstName,
-        lastName,
-        memberShip: order.notes.memberShip,
-      },
+      // notes: {
+      //   firstName,
+      //   lastName,
+      //   memberShip: order.notes.memberShip,
+      // },
+      notes: order.notes,
     });
     const savedPayment = await paymentInfo.save();
     res.status(201).json({
@@ -86,13 +89,13 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
         user.isPremium = true;
         user.memberShipType = payment.notes.memberShip;
         await user.save();
-        console.log(`[${timestamp}] 🎉 User upgraded to premium`);
+        console.log(`🎉 User upgraded to premium`);
       }
     }
 
     return res.status(200).send("Webhook processed");
   } catch (e) {
-    console.error(`[${timestamp}] Webhook error:`, e.message);
+    console.error(`🔴 Webhook error:`, e.message);
     return res.status(400).send(e.message);
   }
 });
