@@ -46,14 +46,14 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
 });
 
 paymentrouter.post("/payment/webhook", async (req, res) => {
-  const signature = req.headers("x-razorpay-signature");
+  const signature = req.headers["x-razorpay-signature"];
   try {
+    console.log("Web hook called");
     const isValid = await validateWebhookSignature(
       JSON.stringify(req.body),
       signature,
       process.env.RAZORPAY_WEBHOOK_SECRET
     );
-    console.log(isValid);
     if (!isValid) {
       res.status(401).send("Webhook is not valid");
     }
@@ -63,16 +63,18 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
       orderId: paymentDetails.orderId,
     });
     payment.status = paymentDetails.status;
+    console.log(paymentDetails);
+
     await payment.save();
     // Update premium flag in DB.
-    const user = await User.findById({ _id: payment.userId });
-    console.log(user);
-    const membership = await User.findOne({
-      memberShipType: payment.notes.memberShipType,
-    });
-    console.log(membership);
-
-    await User.save();
+    if (payment.status === "captured" || payment.status === "authorized") {
+      const user = await User.findById({ _id: payment.userId });
+      user.isPremium = true;
+      user.memberShipType = payment.notes.memberShipType;
+      console.log(user);
+      await user.save();
+    }
+    res.status(200).send("Webhook executed successfully");
   } catch (e) {
     res.status(400).send(e.message);
   }
