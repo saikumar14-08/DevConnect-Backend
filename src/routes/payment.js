@@ -18,6 +18,7 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
       amount: memberShipTypes[choice] * 100,
       currency: "INR",
       receipt: "receipt#2",
+      payment_capture: 1,
       notes: {
         firstName,
         lastName,
@@ -59,14 +60,17 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     }
     // Update payment status in DB.
     const paymentDetails = await req.body.payload.payment.entity;
+    console.log("Payment Details: ", paymentDetails);
     const payment = await PaymentInformation.findOne({
       orderId: paymentDetails.orderId,
     });
     payment.status = paymentDetails.status;
-    console.log(paymentDetails);
+    console.log("Payment details=========="+paymentDetails);
 
     await payment.save();
+console.log("Payment Saved");
     // Update premium flag in DB.
+
     if (payment.status === "captured" || payment.status === "authorized") {
       const user = await User.findById({ _id: payment.userId });
       user.isPremium = true;
@@ -75,6 +79,13 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
       await user.save();
     }
     res.status(200).send("Webhook executed successfully");
+    const user = await User.findById({ _id: payment.userId });
+    console.log(user);
+    const membership = await User.findOne({
+      memberShipType: payment.notes.memberShipType,
+    });
+    console.log("User Saved");
+    await User.save();
   } catch (e) {
     res.status(400).send(e.message);
   }
