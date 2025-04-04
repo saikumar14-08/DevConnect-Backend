@@ -48,12 +48,18 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
     return res.status(500).send(e.message);
   }
 });
-
 paymentrouter.post("/payment/webhook", async (req, res) => {
-  // const signature = req.headers["x-razorpay-signature"];
   const webhookSignature = req.get("X-Razorpay-Signature");
+  const timestamp = new Date().toISOString(); // Get the current timestamp in ISO format
+
   try {
-    console.log("🔔 Webhook received");
+    console.log(`[${timestamp}] 🔔 Webhook received`);
+
+    // Log the user ID for tracking
+    const userId = req.body?.payload?.payment?.entity?.user_id; // Assuming user_id exists in the webhook payload
+
+    console.log(`[${timestamp}] UserID: ${userId}`);
+
     const isValid = validateWebhookSignature(
       JSON.stringify(req.body),
       webhookSignature,
@@ -61,25 +67,26 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     );
 
     if (!isValid) {
-      console.log("❌ Invalid webhook signature");
+      console.log(`[${timestamp}] ❌ Invalid webhook signature`);
       return res.status(401).send("Invalid webhook signature");
     }
+
     const paymentDetails = req.body.payload.payment.entity;
 
-    console.log("✅ Payment Details:", paymentDetails);
+    console.log(`[${timestamp}] ✅ Payment Details:`, paymentDetails);
 
     const payment = await PaymentInformation.findOne({
       orderId: paymentDetails.order_id,
     });
 
     if (!payment) {
-      console.log("⚠️ No matching payment found");
+      console.log(`[${timestamp}] ⚠️ No matching payment found`);
       return res.status(404).send("Payment not found");
     }
 
     payment.status = paymentDetails.status;
     await payment.save();
-    console.log("✅ Payment status updated");
+    console.log(`[${timestamp}] ✅ Payment status updated`);
 
     if (["captured", "authorized"].includes(payment.status)) {
       const user = await User.findById(payment.userId);
@@ -87,13 +94,13 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
         user.isPremium = true;
         user.memberShipType = payment.notes.memberShip;
         await user.save();
-        console.log("🎉 User upgraded to premium");
+        console.log(`[${timestamp}] 🎉 User upgraded to premium`);
       }
     }
 
     return res.status(200).send("Webhook processed");
   } catch (e) {
-    console.error("Webhook error:", e.message);
+    console.error(`[${timestamp}] Webhook error:`, e.message);
     return res.status(400).send(e.message);
   }
 });
