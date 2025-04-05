@@ -24,8 +24,6 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
         memberShip: choice,
       },
     });
-    console.log("Order: ", order);
-
     const paymentInfo = new PaymentInformation({
       userId: req.user._id,
       orderId: order.id,
@@ -33,11 +31,6 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
       currency: order.currency,
       receipt: order.receipt,
       status: order.status,
-      // notes: {
-      //   firstName,
-      //   lastName,
-      //   memberShip: order.notes.memberShip,
-      // },
       notes: order.notes,
     });
     const savedPayment = await paymentInfo.save();
@@ -53,7 +46,6 @@ paymentrouter.post("/payment", userAuth, async (req, res) => {
 
 paymentrouter.post("/payment/webhook", async (req, res) => {
   try {
-    console.log(`🔔 Webhook received`);
     const webhookSignature = req.get("X-Razorpay-Signature");
     const isValid = validateWebhookSignature(
       JSON.stringify(req.body),
@@ -62,51 +54,20 @@ paymentrouter.post("/payment/webhook", async (req, res) => {
     );
 
     if (!isValid) {
-      console.log(`❌ Invalid webhook signature`);
       return res.status(401).send("Invalid webhook signature");
     }
-
     const paymentDetails = req.body.payload.payment.entity;
-
-    console.log(`✅ Payment Details:== `, paymentDetails);
-
     const payment = await PaymentInformation.findOne({
       orderId: paymentDetails.order_id,
     });
-    console.log("Payment:--- ", payment);
     payment.status = paymentDetails.status;
     await payment.save();
-    console.log("Payment saved");
-
     const user = await User.findOne({ _id: payment.userId });
     user.isPremium = true;
     user.memberShipType = payment.notes.memberShip;
-    console.log("User saved: ", user);
-
     await user.save();
-
-    // if (!payment) {
-    //   console.log(`⚠️ No matching payment found`);
-    //   return res.status(404).send("Payment not found");
-    // }
-
-    // payment.status = paymentDetails.status;
-    // await payment.save();
-    // console.log(`✅ Payment status updated`);
-
-    // if (["captured", "authorized"].includes(payment.status)) {
-    //   const user = await User.findById(payment.userId);
-    //   if (user) {
-    //     user.isPremium = true;
-    //     user.memberShipType = payment.notes.memberShip;
-    //     await user.save();
-    //     console.log(`🎉 User upgraded to premium`);
-    //   }
-    // }
-
     return res.status(200).send("Webhook processed Successfully");
   } catch (e) {
-    console.error(`🔴 Webhook error:`, e.message);
     return res.status(400).send(e.message);
   }
 });
