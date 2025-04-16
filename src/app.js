@@ -1,15 +1,16 @@
 const express = require("express");
-const connectDB = require("./config/database");
-const { default: mongoose } = require("mongoose");
-const cookieParser = require("cookie-parser");
 const app = express();
-const userAuth = require("./middleware/userAuth");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const http = require("http");
+const connectDB = require("./config/database");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const UserRouter = require("./routes/userroute");
-const cors = require("cors");
 const paymentrouter = require("./routes/payment");
+const socketInit = require("./utils/socket");
+
 require("./utils/cronJob");
 require("dotenv").config();
 
@@ -28,10 +29,13 @@ app.use("/", requestRouter);
 app.use("/", UserRouter);
 app.use("/", paymentrouter);
 
+const server = http.createServer(app);
+socketInit(server);
+
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    app.listen(process.env.PORT, () =>
+    server.listen(process.env.PORT, () =>
       console.log(`Server successfully listening to port ${process.env.PORT}`)
     );
   })
