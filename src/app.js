@@ -15,12 +15,20 @@ const chatRouter = require("./routes/chat");
 require("./utils/cronJob");
 require("dotenv").config();
 
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://www.devconnekt.com"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
