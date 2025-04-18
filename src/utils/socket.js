@@ -13,8 +13,10 @@ const getSecretRoom = (userId, targetUserId) => {
 
 const socketInit = (server) => {
   const io = socket(server, {
+    path: "/api/socket.io", // For Production
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://www.devconnekt.com", // For Production
+      // origin: "http://localhost:5173", For local
       credentials: true,
     },
   });
