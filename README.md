@@ -1,2 +1,2 @@
 # Node_Project
-Creating a Application like Tinder for Developers.
+Creating a Application for Developers to network and get montorship and mentees.
