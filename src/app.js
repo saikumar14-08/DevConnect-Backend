@@ -49,4 +49,4 @@ connectDB()
       console.log(`Server successfully listening to port ${process.env.PORT}`)
     );
   })
-  .catch((e) => console.log("Something went wrong"));
+  .catch((e) => console.log("Something went wrong.🔴", e));
