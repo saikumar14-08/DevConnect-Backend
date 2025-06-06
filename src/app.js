@@ -39,7 +39,6 @@ app.use("/", UserRouter);
 app.use("/", paymentrouter);
 app.use("/", chatRouter);
 
-setupGraphQL(app);
 const server = http.createServer(app);
 socketInit(server);
 
