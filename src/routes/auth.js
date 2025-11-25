@@ -4,6 +4,7 @@ const { SignUpAPI } = require("../utils/userValidation");
 const authRouter = express.Router();
 const user = require("../models/user");
 const { trim } = require("validator");
+const logger = require("../utils/logger");
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -46,13 +47,19 @@ authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
     const emailCheck = await user.findOne({ emailId: emailId });
-    if (!emailCheck) throw new Error("Invalid email ID.");
+    if (!emailCheck) {    
+      logger.error("Invalid email ID attempt for email: " + emailId);
+      throw new Error("Invalid email ID.");
+    }
     const pwdCheck = await emailCheck.decryptPwd(password);
     if (pwdCheck) {
       const token = await emailCheck.getJWT();
       res.cookie("usercookie", token);
       if (token) res.send(emailCheck);
-    } else throw new Error("Invalid Password");
+    } else{
+      logger.error(`Invalid Password attempt for user: ${emailId}`);
+      throw new Error("Invalid Password");
+    }
   } catch (e) {
     res.status(500).send(e.message);
   }
@@ -60,6 +67,7 @@ authRouter.post("/login", async (req, res) => {
 
 authRouter.post("/logout", async (req, res) => {
   res.cookie("usercookie", null, { expires: new Date(Date.now()) });
+  logger.info("User logged out successfully");
   res.send("Logged out successfully");
 });
 module.exports = authRouter;

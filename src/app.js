@@ -15,13 +15,27 @@ const chatRouter = require("./routes/chat");
 require("./utils/cronJob");
 require("dotenv").config();
 
-// app.use(
-//   cors({
-//     origin: "http://localhost:5173",
-//     credentials: true,
-//   })
-// );
+// ---------- LOGGING SETUP ----------
+const fs = require("fs");
+const path = require("path");
+const morgan = require("morgan");
+const logger = require("./utils/logger");
 
+// Create logs folder if not present
+if (!fs.existsSync("logs")) {
+  fs.mkdirSync("logs");
+}
+
+// Morgan HTTP access logs
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "../logs/access.log"),
+  { flags: "a" }
+);
+
+// Apply Morgan middleware
+app.use(morgan("combined", { stream: accessLogStream }));
+
+// ---------- CORS ----------
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://www.devconnekt.com"],
@@ -32,6 +46,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// ---------- ROUTES ----------
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
@@ -39,14 +54,19 @@ app.use("/", UserRouter);
 app.use("/", paymentrouter);
 app.use("/", chatRouter);
 
+// ---------- SERVER + SOCKET ----------
 const server = http.createServer(app);
 socketInit(server);
 
+// ---------- START SERVER ----------
 connectDB()
   .then(() => {
-    console.log("Database connected successfully");
-    server.listen(process.env.PORT, () =>
-      console.log(`Server successfully listening to port ${process.env.PORT}`)
-    );
+    logger.info("Database connected successfully");
+
+    server.listen(process.env.PORT, () => {
+      logger.info(`Server listening on port ${process.env.PORT}`);
+    });
   })
-  .catch((e) => console.log("Something went wrong.🔴", e));
+  .catch((e) => {
+    logger.error("Database connection error: " + e.message);
+  });
